@@ -1,0 +1,75 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { ActionGetResponse, ActionPostRequest, ActionPostResponse, ACTIONS_CORS_HEADERS, createPostResponse, MEMO_PROGRAM_ID } from "@solana/actions"
+import { Transaction, TransactionInstruction, ComputeBudgetProgram, PublicKey, Connection, clusterApiUrl, SystemProgram } from "@solana/web3.js"
+// https://youtu.be/dLpu6vYsTaI?si=szmd-77j0JIDYvm-
+
+export async function OPTIONS(request: Request) {
+    return new Response(null, { headers : ACTIONS_CORS_HEADERS })
+}
+
+
+export async function POST(request: NextRequest) {
+    try {
+        const body = await request.json();
+        const { title, description, imageUrl, amount, walletAddress } = body;
+
+        // Simple validation
+        if (!title || !description || !imageUrl || !amount || !walletAddress) {
+            return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
+        }
+
+        if (typeof amount !== 'number' || amount <= 0) {
+            return NextResponse.json({ error: 'Amount must be a positive number' }, { status: 400 });
+        }
+
+        // Example: Processing data
+        const processedData = {
+            title: title.trim(),
+            description: description.trim(),
+            imageUrl: imageUrl.trim(),
+            amount,
+            walletAddress: walletAddress.trim(),
+        };
+        console.log(processedData)
+
+        // add data to blink code
+        const response : ActionGetResponse  = {
+            icon : new URL("/next.svg", new URL(request.url).origin).toString(),
+            label : "Click me to donate",
+            description : description,
+            title : title,
+            links: {
+                actions: [
+                    {
+                        href: request.url + "?action&amount=" + amount,
+                        label: "0.01 SOL",
+                    },
+                    {
+                        href: request.url + "?action&amount=0.05",
+                        label: "0.05 SOL",
+                    },
+                    {
+                        href: request.url + "?action&amount={amount}",
+                        label: "another",
+                        parameters:  [
+                            {
+                                name: "amount",
+                                label: "custom",
+                                required: true
+                        
+                        }        
+                    ],
+                    },
+                ]
+            },
+            }
+            error: {
+                message: "This blink is not implemented yet!"
+            }
+
+
+        return NextResponse.json(processedData.walletAddress);
+    } catch (error) {
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    }
+}

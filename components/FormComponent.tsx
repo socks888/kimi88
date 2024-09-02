@@ -1,7 +1,7 @@
 // components/FormComponent.tsx
 "use client";
-
-import { useState, ChangeEvent, FormEvent } from 'react';
+// import { useEffect, useState } from 'react'
+import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
